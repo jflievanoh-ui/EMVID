@@ -1,6 +1,8 @@
+# backend/server.py
 from main import app
+import os
 
-# This is used by supervisor to run the application
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    port = int(os.environ.get("PORT", 8000))  # required by Render
+    uvicorn.run(app, host="0.0.0.0", port=port)
