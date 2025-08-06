@@ -310,6 +310,10 @@ const DirectorDashboard = () => {
             <VideoSources />
           </TabsContent>
 
+          <TabsContent value="router">
+            <AudioVideoRouter />
+          </TabsContent>
+
           <TabsContent value="midi">
             <MidiController />
           </TabsContent>
