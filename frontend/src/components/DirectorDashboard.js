@@ -33,6 +33,7 @@ import ParticipantGrid from "./ParticipantGrid";
 import AudioMixer from "./AudioMixer";
 import VideoSources from "./VideoSources";
 import MidiController from "./MidiController";
+import AudioVideoRouter from "./AudioVideoRouter";
 import { toast } from "sonner";
 
 const DirectorDashboard = () => {
