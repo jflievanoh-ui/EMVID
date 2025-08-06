@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DirectorDashboard from "./components/DirectorDashboard";
-import ParticipantRoom from "./components/ParticipantRoom";
+import EnhancedParticipantRoom from "./components/EnhancedParticipantRoom";
 import AuthPage from "./components/AuthPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import { StudioProvider } from "./contexts/StudioContext";
