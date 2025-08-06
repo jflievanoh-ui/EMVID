@@ -134,7 +134,7 @@ const DirectorDashboard = () => {
       {/* Main Content */}
       <div className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-6 bg-black/20 backdrop-blur-lg">
+          <TabsList className="grid w-full grid-cols-7 mb-6 bg-black/20 backdrop-blur-lg">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <Monitor className="w-4 h-4" />
               Overview
@@ -154,6 +154,10 @@ const DirectorDashboard = () => {
             <TabsTrigger value="video" className="flex items-center gap-2">
               <Monitor className="w-4 h-4" />
               Video
+            </TabsTrigger>
+            <TabsTrigger value="router" className="flex items-center gap-2">
+              <Radio className="w-4 h-4" />
+              Router
             </TabsTrigger>
             <TabsTrigger value="midi" className="flex items-center gap-2">
               <Sliders className="w-4 h-4" />
