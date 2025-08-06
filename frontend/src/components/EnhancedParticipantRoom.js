@@ -64,14 +64,18 @@ const EnhancedParticipantRoom = () => {
     }
 
     setCurrentRoom(room);
+  }, [user, roomId, rooms, navigate]);
+
+  useEffect(() => {
+    // Initialize participant volumes and visibility only when current room changes
+    if (!currentRoom) return;
     
-    // Initialize participant volumes and visibility
-    const roomParticipants = participants.filter(p => p.roomId === room.id);
+    const roomParticipants = participants.filter(p => p.roomId === currentRoom.id);
     const initialVolumes = {};
     const initialVisibility = {};
     
     roomParticipants.forEach(p => {
-      if (p.id !== user.id) {
+      if (p.id !== user?.id) {
         initialVolumes[p.id] = 0.8;
         initialVisibility[p.id] = true;
       }
@@ -81,7 +85,7 @@ const EnhancedParticipantRoom = () => {
     setParticipantVideoVisibility(initialVisibility);
     
     // Simulate joining the room
-    if (user && room) {
+    if (user && currentRoom) {
       const participantData = {
         id: user.id,
         name: user.name,
@@ -91,12 +95,12 @@ const EnhancedParticipantRoom = () => {
         isScreenSharing,
         joinedAt: new Date().toISOString(),
         avatar: user.avatar,
-        roomId: room.id
+        roomId: currentRoom.id
       };
       
-      joinRoom(room.id, participantData);
+      joinRoom(currentRoom.id, participantData);
     }
-  }, [user, roomId, rooms, navigate, joinRoom, isVideoEnabled, isAudioEnabled, isScreenSharing]);
+  }, [currentRoom, user, joinRoom, isVideoEnabled, isAudioEnabled, isScreenSharing]);
 
   const handleLeaveRoom = () => {
     logout();
