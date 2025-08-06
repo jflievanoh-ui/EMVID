@@ -17,7 +17,7 @@ function App() {
             <Routes>
               <Route path="/" element={<AuthPage />} />
               <Route path="/director" element={<DirectorDashboard />} />
-              <Route path="/room/:roomId" element={<EnhancedParticipantRoom />} />
+              <Route path="/room/:roomId" element={<ParticipantRoom />} />
             </Routes>
             <Toaster />
           </StudioProvider>
