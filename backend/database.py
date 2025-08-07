@@ -29,7 +29,7 @@ async def close_mongo_connection():
 
 async def create_indexes():
     """Create database indexes for optimal performance"""
-    if not db.database:
+    if db is None or db.database is None:
         return
     
     # Rooms collection indexes
