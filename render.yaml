@@ -18,5 +18,4 @@ services:
     rootDir: frontend
     buildCommand: yarn install && yarn build
     staticPublishPath: build
-    plan: free
     autoDeploy: true
