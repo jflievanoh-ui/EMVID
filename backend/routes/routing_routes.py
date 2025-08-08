@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List, Dict, Any
 from backend.models import Route, RouteCreate, RouteUpdate
-from services.routing_service import routing_service
+from backend.services.routing_service import routing_service
 
 router = APIRouter()
 
