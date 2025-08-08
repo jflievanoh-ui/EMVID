@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: emvid-backend
+    env: python
+    repo: https://github.com/jflievanoh-ui/EMVID
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    autoDeploy: true
+
+  - type: static
+    name: emvid-frontend
+    repo: https://github.com/jflievanoh-ui/EMVID
+    branch: main
+    rootDir: frontend
+    buildCommand: yarn install && yarn build
+    staticPublishPath: build
+    plan: free
+    autoDeploy: true
