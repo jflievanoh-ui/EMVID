@@ -1,7 +1,7 @@
 from typing import List, Optional
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from backend.models import VideoSource, VideoSourceUpdate
-from backend.database import get_database
+from models import VideoSource, VideoSourceUpdate
+from database import get_database
 
 
 class VideoService:
