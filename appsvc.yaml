@@ -1,6 +1,10 @@
 version: 1
-build:
-  commands:
-    - python -m pip install --upgrade pip
-    - python -m pip install -r requirements.txt
-run: gunicorn backend.main:app --workers 4 --bind 0.0.0.0:$PORT
+
+pre-build:
+  - python -m pip install --upgrade pip
+  - python -m pip install -r requirements.txt
+
+post-build: |
+  echo "Post-build steps completed"
+
+run: gunicorn main:app --workers 4 --bind 0.0.0.0:$PORT
