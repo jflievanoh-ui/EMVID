@@ -1,7 +1,7 @@
 from typing import Optional
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from models import Session, SessionUpdate, SessionResponse, Room, Participant
-from database import get_database
+from backend.database import get_database
 from datetime import datetime
 
 

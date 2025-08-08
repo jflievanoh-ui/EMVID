@@ -1,13 +1,11 @@
+# backend/server.py
+from main import app
 import os
-import uvicorn
-import logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))  # required by Render
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
-host = "0.0.0.0"
-port = int(os.getenv("PORT", 10000))  # Use Render's port if set
-
-logger.info(f"Starting server on {host}:{port}")
-
-uvicorn.run("backend.main:app", host=host, port=port, reload=False)
+from backend.routes import signaling_routes
+app.include_router(signaling_routes.router)
