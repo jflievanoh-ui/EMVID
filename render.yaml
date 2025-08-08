@@ -10,8 +10,9 @@ services:
     plan: free
     autoDeploy: true
 
-  - type: static
+  - type: web
     name: emvid-frontend
+    env: static
     repo: https://github.com/jflievanoh-ui/EMVID
     branch: main
     rootDir: frontend
