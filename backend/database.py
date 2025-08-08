@@ -1,64 +1,84 @@
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 import os
-from typing import Optional
+import motor.motor_asyncio
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-class Database:
-    client: Optional[AsyncIOMotorClient] = None
-    database: Optional[AsyncIOMotorDatabase] = None
+MONGO_URL = os.environ.get("MONGO_URL")
+DB_NAME = os.environ.get("DB_NAME", "virtual_studio")  # Default database name
 
-db = Database()
+client: AsyncIOMotorClient = None
+database: AsyncIOMotorDatabase = None
 
-async def get_database() -> AsyncIOMotorDatabase:
-    return db.database
 
 async def connect_to_mongo():
     """Create database connection"""
-    mongo_url = os.environ.get('MONGO_URL')
-    db_name = os.environ.get('DB_NAME', 'virtual_studio')
-    
-    db.client = AsyncIOMotorClient(mongo_url)
-    db.database = db.client[db_name]
-    
-    # Create indexes for performance
-    await create_indexes()
+    global client, database
+
+    if not MONGO_URL:
+        raise EnvironmentError(
+            "MONGO_URL environment variable not set.  Please provide the MongoDB connection string."
+        )
+
+    try:
+        client = AsyncIOMotorClient(MONGO_URL)
+        database = client[DB_NAME]
+        await create_indexes()
+        print("Connected to MongoDB")
+    except Exception as e:
+        print(f"Error connecting to MongoDB: {e}")
+        raise  # Re-raise the exception to prevent the app from starting without a database connection
+
 
 async def close_mongo_connection():
     """Close database connection"""
-    if db.client:
-        db.client.close()
+    if client:
+        client.close()
+
 
 async def create_indexes():
     """Create database indexes for optimal performance"""
-    if db is None or db.database is None:
+    if not database:
+        print("Database not initialized. Skipping index creation.")
         return
-    
+
     # Rooms collection indexes
-    await db.database.rooms.create_index("invite_code", unique=True)
-    await db.database.rooms.create_index("director_id")
-    await db.database.rooms.create_index("status")
-    
+    await database.rooms.create_index("invite_code", unique=True)
+    await database.rooms.create_index("director_id")
+    await database.rooms.create_index("status")
+
     # Participants collection indexes
-    await db.database.participants.create_index("room_id")
-    await db.database.participants.create_index([("room_id", 1), ("name", 1)])
-    
+    await database.participants.create_index("room_id")
+    await database.participants.create_index([("room_id", 1), ("name", 1)])
+
     # Audio sources collection indexes
-    await db.database.audio_sources.create_index("room_id")
-    await db.database.audio_sources.create_index("participant_id")
-    
+    await database.audio_sources.create_index("room_id")
+    await database.audio_sources.create_index("participant_id")
+
     # Video sources collection indexes
-    await db.database.video_sources.create_index("room_id")
-    await db.database.video_sources.create_index("participant_id")
-    
+    await database.video_sources.create_index("room_id")
+    await database.video_sources.create_index("participant_id")
+
     # Routes collection indexes
-    await db.database.routes.create_index("room_id")
-    await db.database.routes.create_index("source_id")
-    
+    await database.routes.create_index("room_id")
+    await database.routes.create_index("source_id")
+
     # Sessions collection indexes
-    await db.database.sessions.create_index("room_id", unique=True)
-    
+    await database.sessions.create_index("room_id", unique=True)
+
     # Signaling collection indexes (for WebRTC)
-    await db.database.signaling.create_index([("room_id", 1), ("created_at", -1)])
-    await db.database.signaling.create_index([("participant_id", 1), ("created_at", -1)])
-    
+    await database.signaling.create_index([("room_id", 1), ("created_at", -1)])
+    await database.signaling.create_index([("participant_id", 1), ("created_at", -1)])
+
     # TTL index for signaling messages (auto-delete after 1 hour)
-    await db.database.signaling.create_index("created_at", expireAfterSeconds=3600)
+    await database.signaling.create_index("created_at", expireAfterSeconds=3600)
+
+
+async def get_database() -> AsyncIOMotorDatabase:
+    """Returns the database instance."""
+    if not database:
+        raise Exception("Database connection not initialized. Call connect_to_mongo() first.")
+    return database
+
+
+# Example usage (optional):
+# You can import 'database' directly into other modules.
+# from database import database
