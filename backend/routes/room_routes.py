@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from models import Room, RoomCreate, RoomJoin, RoomResponse, Participant
+from backend.models import Room, RoomCreate, RoomJoin, RoomResponse, Participant
 from services.room_service import room_service
 from services.routing_service import routing_service
 

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models import Session, SessionUpdate, SessionResponse
+from backend.models import Session, SessionUpdate, SessionResponse
 from services.session_service import session_service
 
 router = APIRouter()

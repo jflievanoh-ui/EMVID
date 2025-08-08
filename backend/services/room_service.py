@@ -1,7 +1,7 @@
 from typing import List, Optional
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from models import Room, RoomCreate, Participant, AudioSource, VideoSource, Route, RoomResponse, SourceType
-from backend.database import get_database
+from backend.models import Room, RoomCreate, Participant, AudioSource, VideoSource, Route, RoomResponse, SourceType
+from database import get_database
 import uuid
 from datetime import datetime
 

@@ -1,5 +1,5 @@
 # backend/server.py
-from backend.main import app
+from main import app
 import os
 
 if __name__ == "__main__":

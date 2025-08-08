@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models import User, UserCreate, UserLogin, UserRole
+from backend.models import User, UserCreate, UserLogin, UserRole
 import uuid
 
 router = APIRouter()
