@@ -13,7 +13,7 @@ async def connect_to_mongo():
     """Create database connection"""
     global client, database
 
-    if not MONGO_URL:
+    if MONGO_URL is None:  # Correct way to check for None
         raise EnvironmentError(
             "MONGO_URL environment variable not set.  Please provide the MongoDB connection string."
         )
@@ -36,7 +36,7 @@ async def close_mongo_connection():
 
 async def create_indexes():
     """Create database indexes for optimal performance"""
-    if not database:
+    if database is None:  # Correct way to check for None
         print("Database not initialized. Skipping index creation.")
         return
 
@@ -74,11 +74,6 @@ async def create_indexes():
 
 async def get_database() -> AsyncIOMotorDatabase:
     """Returns the database instance."""
-    if not database:
+    if database is None:
         raise Exception("Database connection not initialized. Call connect_to_mongo() first.")
     return database
-
-
-# Example usage (optional):
-# You can import 'database' directly into other modules.
-# from database import database
