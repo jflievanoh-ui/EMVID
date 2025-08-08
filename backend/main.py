@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
@@ -25,14 +25,21 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    logger.info("Starting Virtual Studio backend...")
-    await connect_to_mongo()
-    logger.info("Connected to MongoDB")
+    logger.info("🚀 Starting Virtual Studio backend...")
+    try:
+        await connect_to_mongo()
+        logger.info("✅ Connected to MongoDB")
+    except Exception as e:
+        logger.error(f"⚠️ Could not connect to MongoDB: {e}")
+        logger.warning("The app will still run, but database features will be unavailable.")
     yield
     # Shutdown
-    logger.info("Shutting down Virtual Studio backend...")
-    await close_mongo_connection()
-    logger.info("Disconnected from MongoDB")
+    logger.info("🛑 Shutting down Virtual Studio backend...")
+    try:
+        await close_mongo_connection()
+        logger.info("✅ Disconnected from MongoDB")
+    except Exception as e:
+        logger.error(f"⚠️ Error while closing MongoDB connection: {e}")
 
 # Create FastAPI app with lifespan events
 app = FastAPI(
@@ -46,7 +53,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],  # Configure for production
+    allow_origins=["*"],  # ⚠️ TODO: Restrict origins in production
     allow_methods=["*"],
     allow_headers=["*"],
 )
