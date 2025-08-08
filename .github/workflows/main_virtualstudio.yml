@@ -30,7 +30,7 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt
+        run: pip install -r requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -58,9 +58,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_018865E9B95C483B97900B050638D57C }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_903E973CA2D3415B85D6ACDD104E246E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F4E5E72437E44BE48F2626754535BF18 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_10B7FEB296404982973C16A5BF6925A1 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_618269E73A234C9B97A7D30C84690C8A }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3B5A142A935C479C9328989377DEB740 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -68,5 +68,4 @@ jobs:
         with:
           app-name: 'virtualstudio'
           slot-name: 'Production'
-
           
