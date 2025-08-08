@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Import database connection
-from backend.database import connect_to_mongo, close_mongo_connection
+from .database import connect_to_mongo, close_mongo_connection
 
 # Import route modules
 from backend.routes import auth_routes, room_routes, audio_routes, video_routes, routing_routes, session_routes
@@ -74,4 +74,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=10000)
