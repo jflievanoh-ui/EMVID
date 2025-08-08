@@ -1,7 +1,7 @@
 from typing import List, Optional
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from backend.models import AudioSource, AudioSourceUpdate
-from database import get_database
+from backend.database import get_database
 
 
 class AudioService:

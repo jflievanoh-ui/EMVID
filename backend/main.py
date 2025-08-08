@@ -6,10 +6,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Import database connection
-from database import connect_to_mongo, close_mongo_connection
+from backend.database import connect_to_mongo, close_mongo_connection
 
 # Import route modules
-from backend.routes import auth_routes, room_routes, audio_routes, video_routes, routing_routes, session_routes
+from routes import auth_routes, room_routes, audio_routes, video_routes, routing_routes, session_routes
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
