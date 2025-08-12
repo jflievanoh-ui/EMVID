@@ -10,7 +10,7 @@ DB_NAME = os.getenv("DB_NAME", "emvid")
 
 if not MONGO_URI:
     # In Render we require MONGO_URI to be set. For local development fallback to localhost.
-    MONGO_URI = "mongodb://localhost:27017"
+    MONGO_URI = os.getenv("MONGO_URI")
 
 client = AsyncIOMotorClient(MONGO_URI)
 database = client[DB_NAME]
