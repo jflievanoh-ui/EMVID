@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict, Any
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from models import Route, RouteCreate, RouteUpdate, AudioSource, VideoSource
-from database import get_database
+from backend.models import Route, RouteCreate, RouteUpdate, AudioSource, VideoSource
+from backend.database import get_database
 
 
 class RoutingService:

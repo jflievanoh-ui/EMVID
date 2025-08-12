@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
-from models import AudioSource, AudioSourceUpdate
-from services.audio_service import audio_service
+from backend.models import AudioSource, AudioSourceUpdate
+from backend.services.audio_service import audio_service
 
 router = APIRouter()
 

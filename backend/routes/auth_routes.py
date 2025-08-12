@@ -1,7 +1,7 @@
 # backend/routes/auth_routes.py
 
 from fastapi import APIRouter, HTTPException
-from models import User, UserCreate, UserLogin, UserRole
+from backend.models import User, UserCreate, UserLogin, UserRole
 import uuid
 from datetime import datetime
 

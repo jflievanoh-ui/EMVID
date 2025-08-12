@@ -6,10 +6,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Import database connection
-from database import connect_to_mongo, close_mongo_connection
+from backend.database import connect_to_mongo, close_mongo_connection
 
 # Import route modules
-from routes import auth_routes, room_routes, audio_routes, video_routes, routing_routes, session_routes
+from backend.routes import auth_routes, room_routes, audio_routes, video_routes, routing_routes, session_routes
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
@@ -48,6 +48,17 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# CORS
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://emvid-frontend.onrender.com")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Add CORS middleware
 app.add_middleware(

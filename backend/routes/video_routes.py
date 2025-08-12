@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List, Dict
-from models import VideoSource, VideoSourceUpdate
-from services.video_service import video_service
+from backend.models import VideoSource, VideoSourceUpdate
+from backend.services.video_service import video_service
 
 router = APIRouter()
 
