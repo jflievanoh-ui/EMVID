@@ -10,8 +10,8 @@ import socketio
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-# ---- Import API routers y DB ----
-from routes.router import api_router
+# ---- Import API routers y sockets manager ----
+from routes import api_router  # ahora importa el api_router desde __init__.py de routes
 from services.sockets_manager import sio_manager
 
 # ---- FastAPI config ----
