@@ -1,4 +1,3 @@
-# backend/main.py
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -6,13 +5,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import socketio
 
-# ---- Load environment ----
+# ---- Load environment variables ----
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-# ---- Import API routers y sockets manager ----
-from routes import api_router  # ahora importa el api_router desde __init__.py de routes
-from services import sio_manager # ahora importa el sio_manager desde __init__.py de services
+# ---- Import API routers ----
+from routes import api_router  # import desde __init__.py de routes
+from services import sio_manager  # nuestro SocketManager global
 
 # ---- FastAPI config ----
 app = FastAPI(
@@ -78,4 +77,4 @@ async def health():
 # ---- Run local (solo desarrollo) ----
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(asgi_app, host="0.0.0.0", port=10000)
+    uvicorn.run(asgi_app, host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
