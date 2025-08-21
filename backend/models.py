@@ -228,3 +228,16 @@ class SessionResponse(BaseModel):
     session: Session
     room: Room
     participants: List[Participant]
+
+
+# Status Check Models
+class StatusCheck(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    status: str
+    message: Optional[str] = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class StatusCheckCreate(BaseModel):
+    status: str
+    message: Optional[str] = None
