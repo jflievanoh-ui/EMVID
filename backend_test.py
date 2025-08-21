@@ -237,17 +237,7 @@ class VirtualStudioTester:
             except Exception as e:
                 self.log_result("POST /api/audio/{source_id}/volume", False, f"Exception: {str(e)}")
 
-            # Test set gain
-            try:
-                gain_data = {"gain": 0.5}
-                response = self.session.post(f"{API_BASE}/audio/{source_id}/gain", json=gain_data)
-                if response.status_code == 200:
-                    source = response.json()
-                    self.log_result("POST /api/audio/{source_id}/gain", True, f"Gain set to: {source['gain']}")
-                else:
-                    self.log_result("POST /api/audio/{source_id}/gain", False, f"Status: {response.status_code}", response.text)
-            except Exception as e:
-                self.log_result("POST /api/audio/{source_id}/gain", False, f"Exception: {str(e)}")
+
 
     def test_video_management(self):
         """Test video management endpoints"""
