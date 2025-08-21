@@ -1,0 +1,29 @@
+services:
+  # ----------------------------
+  # Backend: FastAPI con Python
+  # ----------------------------
+  - type: web
+    name: videolink-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install --no-cache-dir -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGO_URI
+        value: mongodb+srv://jflievanoh:bdoCNPdj7Ud0X4AC@emvid.e1xccmc.mongodb.net/virtual_studio?retryWrites=true&w=majority&appName=emvid
+
+  # ---------------------------------
+  # Frontend: Sitio estático con Vite
+  # ---------------------------------
+  - type: web
+    name: videolink-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: |
+      npm install -g pnpm
+      pnpm install --frozen-lockfile
+      pnpm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://emvid.onrender.com

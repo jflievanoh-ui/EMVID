@@ -1,77 +1,83 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-import logging
+# backend/main.py
+import os
 from pathlib import Path
 from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import socketio
 
-# Import database connection
-from database import connect_to_mongo, close_mongo_connection
-
-# Import route modules
-from routes import auth_routes, room_routes, audio_routes, video_routes, routing_routes, session_routes
-
-# Load environment variables
+# ---- Load environment ----
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / ".env")
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# ---- Import API routers y DB ----
+from app.api.router import api_router
+from app.sockets.manager import sio_manager
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    logger.info("Starting Virtual Studio backend...")
-    await connect_to_mongo()
-    logger.info("Connected to MongoDB")
-    yield
-    # Shutdown
-    logger.info("Shutting down Virtual Studio backend...")
-    await close_mongo_connection()
-    logger.info("Disconnected from MongoDB")
-
-# Create FastAPI app with lifespan events
+# ---- FastAPI config ----
 app = FastAPI(
-    title="Virtual Studio API",
-    description="Professional virtual studio for OBS integration and live streaming",
+    title="EMVID API",
+    description="Backend para videoconferencias y streaming",
     version="1.0.0",
-    lifespan=lifespan
 )
 
-# Add CORS middleware
+# ---- CORS ----
+origins = [
+    "https://emvid-frontend.onrender.com",  # frontend producción
+    "http://localhost:3000",                # desarrollo local
+]
+
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=origins,
     allow_credentials=True,
-    allow_origins=["*"],  # Configure for production
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include all route modules with /api prefix
-app.include_router(auth_routes.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(room_routes.router, prefix="/api/rooms", tags=["Rooms"])
-app.include_router(audio_routes.router, prefix="/api/audio", tags=["Audio"])
-app.include_router(video_routes.router, prefix="/api/video", tags=["Video"])
-app.include_router(routing_routes.router, prefix="/api/routing", tags=["Routing"])
-app.include_router(session_routes.router, prefix="/api/sessions", tags=["Sessions"])
+# ---- REST API ----
+app.include_router(api_router, prefix="/api")
 
-# Health check endpoint
-@app.get("/api/")
-async def root():
-    return {"message": "Virtual Studio API is running"}
+# ---- Socket.IO ----
+sio = socketio.AsyncServer(
+    async_mode="asgi",
+    cors_allowed_origins=origins,
+)
+asgi_app = socketio.ASGIApp(sio, other_asgi_app=app)
 
-@app.get("/api/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "service": "Virtual Studio API",
-        "version": "1.0.0"
-    }
+# ---- Socket.IO events ----
+@sio.event
+async def connect(sid, environ):
+    await sio_manager.on_connect(sid, environ)
 
+@sio.event
+async def disconnect(sid):
+    await sio_manager.on_disconnect(sid)
+
+@sio.event
+async def join_room(sid, data):
+    await sio_manager.join_room(sid, data["room_id"])
+
+@sio.event
+async def offer(sid, data):
+    await sio_manager.forward_to_peer("offer", data)
+
+@sio.event
+async def answer(sid, data):
+    await sio_manager.forward_to_peer("answer", data)
+
+@sio.event
+async def ice_candidate(sid, data):
+    await sio_manager.forward_to_peer("ice-candidate", data)
+
+# ---- Healthcheck ----
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+# ---- Run local (solo desarrollo) ----
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(asgi_app, host="0.0.0.0", port=10000)
+# ---- Run with Gunicorn (producción) ----
+# gunicorn -k uvicorn.workers.UvicornWorker main:asgi_app --bind    
