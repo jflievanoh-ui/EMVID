@@ -136,7 +136,7 @@ class VirtualStudioTester:
         }
         
         try:
-            response = self.session.post(f"{API_BASE}/rooms/", json=room_data, params={"director_id": "test_director"})
+            response = self.session.post(f"{API_BASE}/rooms", json=room_data, params={"director_id": "test_director"})
             if response.status_code == 200:
                 room = response.json()
                 self.test_data['room'] = room
