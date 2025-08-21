@@ -148,7 +148,7 @@ class VirtualStudioTester:
 
         # Test get rooms for director
         try:
-            response = self.session.get(f"{API_BASE}/rooms/", params={"director_id": "test_director"})
+            response = self.session.get(f"{API_BASE}/rooms", params={"director_id": "test_director"})
             if response.status_code == 200:
                 rooms = response.json()
                 self.log_result("GET /api/rooms/", True, f"Retrieved {len(rooms)} rooms")
