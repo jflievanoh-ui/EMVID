@@ -11,8 +11,8 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
 # ---- Import API routers y DB ----
-from app.api.router import api_router
-from app.sockets.manager import sio_manager
+from routes.router import api_router
+from services.sockets_manager import sio_manager
 
 # ---- FastAPI config ----
 app = FastAPI(
@@ -79,5 +79,3 @@ async def health():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(asgi_app, host="0.0.0.0", port=10000)
-# ---- Run with Gunicorn (producción) ----
-# gunicorn -k uvicorn.workers.UvicornWorker main:asgi_app --bind    
