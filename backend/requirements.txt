@@ -14,7 +14,7 @@ email-validator>=2.2.0
 
 # Socket.IO for real-time
 python-socketio==5.13.0
-python-engineio==5.3.0
+python-engineio==5.4.0  # <-- actualizar a 5.4.0 para compatibilidad con Python 3.11
 
 # Optional / utilities
 requests>=2.31.0
