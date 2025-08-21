@@ -15,8 +15,9 @@ services:
   # ---------------------------------
   # Frontend: React App (Static Site)
   # ---------------------------------
-  - type: static
+  - type: web
     name: emvid-frontend
+    env: static
     rootDir: frontend
     buildCommand: |
       npm install -g pnpm
