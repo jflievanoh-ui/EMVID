@@ -338,7 +338,7 @@ class VirtualStudioTester:
             }
             
             try:
-                response = self.session.post(f"{API_BASE}/routing/", json=route_data)
+                response = self.session.post(f"{API_BASE}/routing", json=route_data)
                 if response.status_code == 200:
                     route = response.json()
                     self.test_data['created_route'] = route
