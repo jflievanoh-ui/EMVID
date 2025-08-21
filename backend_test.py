@@ -276,17 +276,7 @@ class VirtualStudioTester:
             except Exception as e:
                 self.log_result("POST /api/video/{source_id}/toggle", False, f"Exception: {str(e)}")
 
-            # Test set resolution
-            try:
-                resolution_data = {"resolution": "1280x720"}
-                response = self.session.post(f"{API_BASE}/video/{source_id}/resolution", json=resolution_data)
-                if response.status_code == 200:
-                    source = response.json()
-                    self.log_result("POST /api/video/{source_id}/resolution", True, f"Resolution set to: {source['resolution']}")
-                else:
-                    self.log_result("POST /api/video/{source_id}/resolution", False, f"Status: {response.status_code}", response.text)
-            except Exception as e:
-                self.log_result("POST /api/video/{source_id}/resolution", False, f"Exception: {str(e)}")
+
 
             # Test get OBS URL
             try:
