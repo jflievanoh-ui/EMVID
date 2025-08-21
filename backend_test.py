@@ -13,7 +13,7 @@ import os
 from typing import Dict, Any, Optional
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://023dde7e-a92f-4e09-97c3-36142d5bf762.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://sleek-vdo-booth.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class VirtualStudioTester:
