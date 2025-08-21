@@ -12,7 +12,7 @@ load_dotenv(ROOT_DIR / ".env")
 
 # ---- Import API routers y sockets manager ----
 from routes import api_router  # ahora importa el api_router desde __init__.py de routes
-from services.sockets_manager import sio_manager
+from services import sio_manager # ahora importa el sio_manager desde __init__.py de services
 
 # ---- FastAPI config ----
 app = FastAPI(
