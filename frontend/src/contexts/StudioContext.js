@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { mockData } from "../utils/mockData";
+import { useAuth } from "./AuthContext"; // Tu contexto de auth que maneja JWT
 
 const StudioContext = createContext();
 
@@ -12,6 +12,7 @@ export const useStudio = () => {
 };
 
 export const StudioProvider = ({ children }) => {
+  const { token, user } = useAuth(); // JWT token y usuario
   const [rooms, setRooms] = useState([]);
   const [activeRoom, setActiveRoom] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -21,75 +22,163 @@ export const StudioProvider = ({ children }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
 
-  useEffect(() => {
-    // Load mock data
-    setRooms(mockData.rooms);
-    setParticipants(mockData.participants);
-    setAudioSources(mockData.audioSources);
-    setVideoSources(mockData.videoSources);
-    setMidiDevices(mockData.midiDevices);
-  }, []);
+  const API_URL = "https://tu-backend.com/api";
+  const WS_URL = "wss://tu-backend.com/ws/studio";
 
-  const createRoom = (roomData) => {
-    const newRoom = {
-      id: "room_" + Date.now(),
-      name: roomData.name,
-      description: roomData.description || "",
-      maxParticipants: roomData.maxParticipants || 12,
-      createdAt: new Date().toISOString(),
-      status: "active",
-      inviteCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
-      participants: []
+  const authHeaders = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`
+  };
+
+  // 🔹 Fetch initial data
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchStudioData = async () => {
+      try {
+        const [roomsRes, participantsRes, audioRes, videoRes, midiRes] = await Promise.all([
+          fetch(`${API_URL}/rooms`, { headers: authHeaders }),
+          fetch(`${API_URL}/participants`, { headers: authHeaders }),
+          fetch(`${API_URL}/audio-sources`, { headers: authHeaders }),
+          fetch(`${API_URL}/video-sources`, { headers: authHeaders }),
+          fetch(`${API_URL}/midi-devices`, { headers: authHeaders })
+        ]);
+
+        setRooms(await roomsRes.json());
+        setParticipants(await participantsRes.json());
+        setAudioSources(await audioRes.json());
+        setVideoSources(await videoRes.json());
+        setMidiDevices(await midiRes.json());
+      } catch (error) {
+        console.error("Failed to fetch studio data:", error);
+      }
     };
-    
+
+    fetchStudioData();
+  }, [token]);
+
+  // 🔹 WebSocket con JWT
+  useEffect(() => {
+    if (!token) return;
+
+    const ws = new WebSocket(`${WS_URL}?token=${token}`);
+
+    ws.onopen = () => console.log("Connected to Studio WS with JWT");
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      switch (data.type) {
+        case "ROOM_UPDATE":
+          setRooms(data.rooms);
+          break;
+        case "PARTICIPANT_UPDATE":
+          setParticipants(data.participants);
+          break;
+        case "AUDIO_UPDATE":
+          setAudioSources(data.audioSources);
+          break;
+        case "VIDEO_UPDATE":
+          setVideoSources(data.videoSources);
+          break;
+        case "MIDI_UPDATE":
+          setMidiDevices(data.midiDevices);
+          break;
+        default:
+          console.log("Unknown WS event:", data);
+      }
+    };
+
+    ws.onerror = (err) => console.error("WS error:", err);
+    ws.onclose = () => console.log("WS disconnected");
+
+    return () => ws.close();
+  }, [token]);
+
+  // 🔹 CRUD con autenticación
+  const createRoom = async (roomData) => {
+    if (!user || user.role !== "director") throw new Error("Unauthorized");
+
+    const res = await fetch(`${API_URL}/rooms`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify(roomData)
+    });
+    const newRoom = await res.json();
     setRooms(prev => [...prev, newRoom]);
     return newRoom;
   };
 
-  const joinRoom = (roomId, participant) => {
-    setRooms(prev => prev.map(room => 
-      room.id === roomId 
-        ? { ...room, participants: [...room.participants, participant] }
-        : room
-    ));
-    
+  const joinRoom = async (roomId, participant) => {
+    const res = await fetch(`${API_URL}/rooms/${roomId}/join`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify(participant)
+    });
+    const updatedRoom = await res.json();
+    setRooms(prev => prev.map(r => r.id === roomId ? updatedRoom : r));
     setParticipants(prev => [...prev, participant]);
   };
 
-  const leaveRoom = (roomId, participantId) => {
-    setRooms(prev => prev.map(room => 
-      room.id === roomId 
-        ? { ...room, participants: room.participants.filter(p => p.id !== participantId) }
-        : room
+  const leaveRoom = async (roomId, participantId) => {
+    await fetch(`${API_URL}/rooms/${roomId}/leave`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ participantId })
+    });
+    setRooms(prev => prev.map(r => r.id === roomId 
+      ? { ...r, participants: r.participants.filter(p => p.id !== participantId) } 
+      : r
     ));
-    
     setParticipants(prev => prev.filter(p => p.id !== participantId));
   };
 
-  const updateParticipant = (participantId, updates) => {
-    setParticipants(prev => prev.map(p => 
-      p.id === participantId ? { ...p, ...updates } : p
-    ));
+  const updateParticipant = async (participantId, updates) => {
+    const res = await fetch(`${API_URL}/participants/${participantId}`, {
+      method: "PATCH",
+      headers: authHeaders,
+      body: JSON.stringify(updates)
+    });
+    const updated = await res.json();
+    setParticipants(prev => prev.map(p => p.id === participantId ? updated : p));
   };
 
-  const toggleRecording = () => {
-    setIsRecording(prev => !prev);
+  const toggleRecording = async () => {
+    if (!user || user.role !== "director") return;
+    const res = await fetch(`${API_URL}/studio/recording`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ isRecording: !isRecording })
+    });
+    if (res.ok) setIsRecording(prev => !prev);
   };
 
-  const toggleStreaming = () => {
-    setIsStreaming(prev => !prev);
+  const toggleStreaming = async () => {
+    if (!user || user.role !== "director") return;
+    const res = await fetch(`${API_URL}/studio/streaming`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ isStreaming: !isStreaming })
+    });
+    if (res.ok) setIsStreaming(prev => !prev);
   };
 
-  const updateAudioSource = (sourceId, updates) => {
-    setAudioSources(prev => prev.map(source => 
-      source.id === sourceId ? { ...source, ...updates } : source
-    ));
+  const updateAudioSource = async (sourceId, updates) => {
+    const res = await fetch(`${API_URL}/audio-sources/${sourceId}`, {
+      method: "PATCH",
+      headers: authHeaders,
+      body: JSON.stringify(updates)
+    });
+    const updated = await res.json();
+    setAudioSources(prev => prev.map(s => s.id === sourceId ? updated : s));
   };
 
-  const updateVideoSource = (sourceId, updates) => {
-    setVideoSources(prev => prev.map(source => 
-      source.id === sourceId ? { ...source, ...updates } : source
-    ));
+  const updateVideoSource = async (sourceId, updates) => {
+    const res = await fetch(`${API_URL}/video-sources/${sourceId}`, {
+      method: "PATCH",
+      headers: authHeaders,
+      body: JSON.stringify(updates)
+    });
+    const updated = await res.json();
+    setVideoSources(prev => prev.map(s => s.id === sourceId ? updated : s));
   };
 
   const value = {
